@@ -1,0 +1,201 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Sync dependencies
+        run: uv sync --all-extras
+      - name: Run pytest tests with coverage
+        run: uv run pytest --cov --cov-branch --cov-report=xml
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  build:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            artifact_name: ddpc-linux-x86_64
+            container: quay.io/pypa/manylinux2014_x86_64
+          - os: macos-13
+            platform: macos
+            artifact_name: ddpc-macos-x86_64
+          - os: macos-14
+            platform: macos
+            artifact_name: ddpc-macos-arm64
+          - os: windows-latest
+            platform: windows
+            artifact_name: ddpc-windows-x86_64.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Linux: Build in manylinux2014 container for CentOS 7 compatibility
+      - name: Build Linux binary in manylinux container
+        if: matrix.platform == 'linux'
+        run: |
+          docker run --rm -v "$(pwd):/workspace" -w /workspace ${{ matrix.container }} bash -c "
+            # Install uv
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            export PATH=\"\$HOME/.local/bin:\$PATH\"
+
+            # Install Python and dependencies
+            uv python install 3.12
+            uv sync --group cicd --all-extras
+
+            # Build with PyInstaller
+            uv run pyinstaller --onefile --name ddpc \
+              --hidden-import=ddpc.data.cli \
+              --hidden-import=ddpc.structure.cli \
+              --hidden-import=ddpc.data.band \
+              --hidden-import=ddpc.data.dos \
+              --collect-all ddpc \
+              src/ddpc/cli.py
+
+            # Rename output
+            mv dist/ddpc dist/${{ matrix.artifact_name }}
+          "
+
+      # macOS and Windows: Build directly on runner
+      - name: Setup uv (non-Linux)
+        if: matrix.platform != 'linux'
+        uses: astral-sh/setup-uv@v4
+        with:
+          python-version: "3.12"
+
+      - name: Build binary (non-Linux)
+        if: matrix.platform != 'linux'
+        run: |
+          uv sync --group cicd --all-extras
+          uv run pyinstaller --onefile --name ddpc \
+            --hidden-import=ddpc.data.cli \
+            --hidden-import=ddpc.structure.cli \
+            --hidden-import=ddpc.data.band \
+            --hidden-import=ddpc.data.dos \
+            --collect-all ddpc \
+            src/ddpc/cli.py
+
+      - name: Rename binary (non-Linux)
+        if: matrix.platform != 'linux'
+        shell: bash
+        run: |
+          if [ "${{ matrix.platform }}" = "windows" ]; then
+            mv dist/ddpc.exe dist/${{ matrix.artifact_name }}
+          else
+            mv dist/ddpc dist/${{ matrix.artifact_name }}
+          fi
+
+      - name: Test binary with real data
+        shell: bash
+        run: |
+          # Run comprehensive binary test suite
+          chmod +x tests/test_binary.sh
+          tests/test_binary.sh dist/${{ matrix.artifact_name }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: dist/${{ matrix.artifact_name }}
+          retention-days: 7
+
+  publish:
+    needs: [test, build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          python-version: "3.12"
+      - name: Sync dependencies
+        run: uv sync --all-extras
+      - name: Get version from pyproject.toml
+        id: version
+        run: |
+          VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $VERSION"
+      - name: Check if version exists on PyPI
+        id: check
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          if curl -f -s "https://pypi.org/pypi/ddpc/$VERSION/json" > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Version $VERSION already exists on PyPI"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Version $VERSION not found on PyPI, will publish"
+          fi
+
+      # Download all built binaries
+      - name: Download all artifacts
+        if: steps.check.outputs.exists == 'false'
+        uses: actions/download-artifact@v4
+        with:
+          path: binaries/
+
+      - name: Build Python package
+        if: steps.check.outputs.exists == 'false'
+        run: uv build
+
+      - name: Create GitHub Release
+        if: steps.check.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
+          body: |
+            Release version ${{ steps.version.outputs.version }}
+
+            ## Installation
+
+            ### Via pip (recommended)
+            ```bash
+            pip install ddpc==${{ steps.version.outputs.version }}
+            ```
+
+            ### Standalone binaries
+            Download the appropriate binary for your platform:
+            - **Linux (x86_64)**: `ddpc-linux-x86_64` (compatible with CentOS 7+)
+            - **macOS (Intel)**: `ddpc-macos-x86_64`
+            - **macOS (Apple Silicon)**: `ddpc-macos-arm64`
+            - **Windows**: `ddpc-windows-x86_64.exe`
+
+            Make the binary executable (Linux/macOS):
+            ```bash
+            chmod +x ddpc-*
+            ./ddpc-* --version
+            ```
+          files: |
+            dist/*
+            binaries/**/*
+          draft: false
+          prerelease: false
+
+      - name: Publish to PyPI
+        if: steps.check.outputs.exists == 'false'
+        uses: pypa/gh-action-pypi-publish@release/v1

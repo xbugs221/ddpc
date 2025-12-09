@@ -1,0 +1,42 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.pixi/
+
+# uv
+uv.lock
+
+# Test and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Project specific
+tests/vasp_input
+dft_data_processing_core.log
+out.POSCAR
+docs/_build
+tests/structures/output
+
+# Nuitka build artifacts
+*.build/
+*.dist/
+*.onefile-build/
+.docker-build.dockerfile
+*.so
+*.spec
+CLAUDE.md
+.actrc

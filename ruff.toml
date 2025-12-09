@@ -1,0 +1,67 @@
+exclude = [
+  ".eggs",
+  ".git",
+  ".ipynb_checkpoints",
+  ".mypy_cache",
+  ".nox",
+  ".pytest_cache",
+  ".ruff_cache",
+  ".tox",
+  ".venv",
+  ".vscode",
+  "__pypackages__",
+  "_build",
+  "build",
+  "dist",
+  "site-packages",
+]
+
+# Same as Black.
+line-length = 100
+indent-width = 4
+
+target-version = "py310"
+
+[lint]
+select = [
+  "B",      # bugbear
+  "C4",     # comprehensions
+  "D",      # pydocstyle
+  "E",      # pycodestyle errors
+  "F",      # pyflakes
+  "I",      # isort
+  "ICN001", # unconventional-import-alias
+  "N",      # pep8-naming conventions
+  "PIE",    # misc lints
+  "PL",     # pylint
+  "PT",     # flake8-pytest-style
+  "PYI",    # flake8-pyi
+  "RSE",    # flake8-raise
+  "RUF",    # Ruff-specific rules
+  "TID",    # tidy imports
+  "W",      # pycodestyle warnings
+]
+
+ignore = [
+  "PLR2004", # magic value used in comparison
+  "PLC0415", # import not at top
+  "E501",    # line too long (let formatter handle it)
+]
+
+fixable = ["ALL"]
+unfixable = []
+
+exclude = []
+per-file-ignores."__init__.py" = ["F401", "F403", "D"]
+per-file-ignores."__about__.py" = ["F401", "F403", "D"]
+per-file-ignores."tests/**/*.py" = ["D100", "D102", "D103", "PLW2901"]
+per-file-ignores."**/cli.py" = ["F811"]
+pydocstyle.convention = "numpy"
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
