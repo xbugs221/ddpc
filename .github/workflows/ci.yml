@@ -200,7 +200,8 @@ jobs:
 
             ### Standalone binaries
             Download the appropriate binary for your platform:
-            - **Linux (x86_64)**: `ddpc-linux-x86_64` (compatible with CentOS 7+)
+            - **Linux (x86_64)**: `ddpc-linux-x86_64` (compatible with glibc2.17+, i.e., CentOS 7+)
+            - **Linux (x86_64)**: `ddpc-linux-x86_64-py314` (compatible with glibc2.28+)
             - **macOS (Intel)**: `ddpc-macos-x86_64`
             - **macOS (Apple Silicon)**: `ddpc-macos-arm64`
             - **Windows**: `ddpc-windows-x86_64.exe`
@@ -209,6 +210,8 @@ jobs:
             ```bash
             chmod +x ddpc-*
             ./ddpc-* --version
+
+            If you find any bug, please create an issue.
             ```
           files: |
             dist/*
