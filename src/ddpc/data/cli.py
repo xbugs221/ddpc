@@ -8,7 +8,8 @@ from rich.table import Table
 
 from ddpc.data._cli_base import FriendlyCommand, FriendlyGroup
 
-console = Console()
+# Force UTF-8 encoding on Windows to handle Unicode characters
+console = Console(force_terminal=True, legacy_windows=False)
 
 
 @click.group(cls=FriendlyGroup, invoke_without_command=True)

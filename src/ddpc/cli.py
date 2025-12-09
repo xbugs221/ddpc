@@ -5,7 +5,8 @@ import sys
 import click
 from rich.console import Console
 
-console = Console()
+# Force UTF-8 encoding on Windows to handle Unicode characters
+console = Console(force_terminal=True, legacy_windows=False)
 
 
 @click.group()
