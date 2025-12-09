@@ -22,7 +22,11 @@ dependencies = ["click>=8.1", "rich>=13.0"]
 
 [project.optional-dependencies]
 data = ["numpy"]
-data-full = ["ddpc[data]", "h5py<3.14"]
+data-full = [
+  "ddpc[data]",
+  "h5py<3.14; python_version < '3.14'",
+  "h5py>=3.14; python_version >= '3.14'",
+]
 
 structure = ["ase>=3.25"]
 structure-full = ["ddpc[structure]", "spglib>=2.6"]

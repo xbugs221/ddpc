@@ -33,24 +33,35 @@ jobs:
     strategy:
       matrix:
         include:
+          # Linux builds with different Python versions and containers
           - os: ubuntu-latest
             platform: linux
+            python-version: "3.12"
             artifact_name: ddpc-linux-x86_64
             container: quay.io/pypa/manylinux2014_x86_64
+          - os: ubuntu-latest
+            platform: linux
+            python-version: "3.14"
+            artifact_name: ddpc-linux-x86_64-py314
+            container: quay.io/pypa/manylinux_2_28_x86_64
+          # macOS and Windows builds
           - os: macos-15-intel
             platform: macos
+            python-version: "3.12"
             artifact_name: ddpc-macos-x86_64
           - os: macos-14
             platform: macos
+            python-version: "3.12"
             artifact_name: ddpc-macos-arm64
           - os: windows-latest
             platform: windows
+            python-version: "3.12"
             artifact_name: ddpc-windows-x86_64.exe
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
-      # Linux: Build in manylinux2014 container for CentOS 7 compatibility
+      # Linux: Build in manylinux container for compatibility
       - name: Build Linux binary in manylinux container
         if: matrix.platform == 'linux'
         run: |
@@ -63,7 +74,7 @@ jobs:
             export PATH=\"\$HOME/.local/bin:\$PATH\"
 
             # Install Python and dependencies
-            uv python install 3.12
+            uv python install ${{ matrix.python-version }}
             uv sync --group cicd --all-extras
 
             # Build with PyInstaller
@@ -85,7 +96,7 @@ jobs:
         if: matrix.platform != 'linux'
         uses: astral-sh/setup-uv@v4
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
 
       - name: Build binary (non-Linux)
         if: matrix.platform != 'linux'
