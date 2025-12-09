@@ -75,6 +75,7 @@ jobs:
 
             # Install Python and dependencies
             uv python install ${{ matrix.python-version }}
+            uv python pin ${{ matrix.python-version }}
             uv sync --group cicd --all-extras
 
             # Build with PyInstaller
