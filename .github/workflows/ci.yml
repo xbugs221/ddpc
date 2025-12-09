@@ -55,6 +55,9 @@ jobs:
         if: matrix.platform == 'linux'
         run: |
           docker run --rm -v "$(pwd):/workspace" -w /workspace ${{ matrix.container }} bash -c "
+            # Install system dependencies for h5py
+            yum install -y hdf5-devel
+
             # Install uv
             curl -LsSf https://astral.sh/uv/install.sh | sh
             export PATH=\"\$HOME/.local/bin:\$PATH\"
