@@ -70,6 +70,7 @@ jobs:
               --hidden-import=ddpc.data.band \
               --hidden-import=ddpc.data.dos \
               --collect-all ddpc \
+              --collect-submodules ase.io \
               src/ddpc/cli.py
 
             # Rename output
@@ -94,6 +95,7 @@ jobs:
             --hidden-import=ddpc.data.band \
             --hidden-import=ddpc.data.dos \
             --collect-all ddpc \
+            --collect-submodules ase.io \
             src/ddpc/cli.py
 
       - name: Rename binary (non-Linux)

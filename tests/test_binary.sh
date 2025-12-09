@@ -53,13 +53,21 @@ run_test() {
     local test_name="$1"
     shift
     echo "Testing: $test_name"
-    if "$@" > /dev/null 2>&1; then
+
+    # Capture output to temporary file
+    local output_file="$(mktemp)"
+    if "$@" > "$output_file" 2>&1; then
         echo "  ✓ PASSED"
         ((TESTS_PASSED++))
+        rm -f "$output_file"
         return 0
     else
-        echo "  ✗ FAILED (exit code: $?)"
+        local exit_code=$?
+        echo "  ✗ FAILED (exit code: $exit_code)"
+        echo "  Error output:"
+        sed 's/^/    /' "$output_file"
         ((TESTS_FAILED++))
+        rm -f "$output_file"
         return 1
     fi
 }
