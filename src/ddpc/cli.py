@@ -1,6 +1,16 @@
 """Unified CLI for DDPC packages."""
 
+import os
 import sys
+
+# Force UTF-8 encoding for Windows before any imports
+if sys.platform == "win32":
+    os.environ["PYTHONIOENCODING"] = "utf-8"
+    # Reconfigure stdout/stderr to use UTF-8
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8")
 
 import click
 from rich.console import Console
