@@ -37,7 +37,7 @@ jobs:
             platform: linux
             artifact_name: ddpc-linux-x86_64
             container: quay.io/pypa/manylinux2014_x86_64
-          - os: macos-13
+          - os: macos-15-intel
             platform: macos
             artifact_name: ddpc-macos-x86_64
           - os: macos-14
@@ -85,6 +85,7 @@ jobs:
 
       - name: Build binary (non-Linux)
         if: matrix.platform != 'linux'
+        shell: bash
         run: |
           uv sync --group cicd --all-extras
           uv run pyinstaller --onefile --name ddpc \
