@@ -58,7 +58,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   build312:
-    needs: test
+    needs: test38
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     strategy:
       matrix:
@@ -161,7 +161,7 @@ jobs:
           retention-days: 7
 
   publish:
-    needs: [test38, build312]
+    needs: build312
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
