@@ -37,7 +37,7 @@ def read(p: Union[Path, str] = "structure.as") -> Atoms:
     else:
         magmoms = None
 
-    freedom = {"lat": lat_fixs} | atom_fix if any(lat_fixs) else atom_fix
+    freedom = {**{"lat": lat_fixs}, **atom_fix} if any(lat_fixs) else atom_fix
     atoms = Atoms(symbols=elements, cell=lattice, info=freedom, magmoms=magmoms, pbc=True)
     cd = lines[6].strip().split()[0]
     _set_poses(atoms, cd, coords)

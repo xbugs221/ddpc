@@ -127,7 +127,7 @@ def _refactor_band(data: dict, nkpt: int, nband: int, elements: List[str], mode:
     elif mode == 5:
         _band_atompxpy(data, nkpt, nband, _data)
     else:
-        print(f"{mode=} not supported yet")
+        print(f"mode={mode} not supported yet")
         raise RuntimeError(f"Unsupported mode: {mode}")
 
     return _data
@@ -171,7 +171,7 @@ def _dos_spxpy(data: dict, energies: np.ndarray) -> dict:
 def _dos_element(data: dict, elements: Union[List[str], None], energies: np.ndarray) -> dict:
     """Process DOS data in element-resolved mode (mode 3)."""
     if not elements:
-        raise ValueError(f"{elements=}")
+        raise ValueError(f"elements={elements}")
     _data = {"energy": energies}
     for k, v in data.items():
         if k.startswith("tdos"):
@@ -278,13 +278,13 @@ def _refactor_dos(
     elif mode == 4:  # atom+spdf
         _data = _dos_atomspdf(data, energies)
     elif mode == 5:  # atom+spxpy...
-        _data = {"energy": energies} | {key: dataset[:] for key, dataset in data.items()}
+        _data = {**{"energy": energies}, **{key: dataset[:] for key, dataset in data.items()}}
     elif mode == 6:  # atom+t2g/eg
         _data = _dos_atomt2geg(data, energies)
     elif mode == 7:  # atom-projected (sum all orbitals per atom)
         _data = _dos_atom(data, energies)
     else:
-        print(f"{mode=} not supported yet")
+        print(f"mode={mode} not supported yet")
         raise RuntimeError(f"Unsupported mode: {mode}")
 
     return _data

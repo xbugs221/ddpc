@@ -62,12 +62,22 @@ def get_symmetry(
 
     spacegroup_str = get_spacegroup(cell, symprec, angle_tolerance, symbol_type)
 
+    # Handle different spglib versions - older versions return dict, newer return object
+    if isinstance(dataset, dict):
+        spacegroup_number = dataset["number"]
+        point_group = dataset["pointgroup"]
+        hall_number = dataset["hall_number"]
+    else:
+        spacegroup_number = dataset.number
+        point_group = dataset.pointgroup
+        hall_number = dataset.hall_number
+
     return {
         "spacegroup": spacegroup_str,
-        "spacegroup_number": dataset.number,
-        "point_group": dataset.pointgroup,
-        "crystal_system": _get_crystal_system(dataset.number),
-        "hall_number": dataset.hall_number,
+        "spacegroup_number": spacegroup_number,
+        "point_group": point_group,
+        "crystal_system": _get_crystal_system(spacegroup_number),
+        "hall_number": hall_number,
     }
 
 
