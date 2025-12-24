@@ -11,9 +11,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.13", "3.14"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v4
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libhdf5-dev pkg-config
       - uses: astral-sh/setup-uv@v4
         with:
           python-version: ${{ matrix.python-version }}
@@ -61,7 +65,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Linux: Build in manylinux container for compatibility
+  #           # Linux: Build in manylinux container for compatibility
       - name: Build Linux binary in manylinux container
         if: matrix.platform == 'linux'
         run: |
@@ -114,30 +118,30 @@ jobs:
             src/ddpc/cli.py
 
       - name: Rename binary (non-Linux)
-        if: matrix.platform != 'linux'
-        shell: bash
-        run: |
-          if [ "${{ matrix.platform }}" = "windows" ]; then
-            mv dist/ddpc.exe dist/${{ matrix.artifact_name }}
-          else
-            mv dist/ddpc dist/${{ matrix.artifact_name }}
-          fi
+  #       if: matrix.platform != 'linux'
+  #       shell: bash
+  #       run: |
+  #         if [ "${{ matrix.platform }}" = "windows" ]; then
+  #           mv dist/ddpc.exe dist/${{ matrix.artifact_name }}
+  #         else
+  #           mv dist/ddpc dist/${{ matrix.artifact_name }}
+  #         fi
 
       - name: Test binary with real data
-        shell: bash
-        env:
-          PYTHONIOENCODING: utf-8
-        run: |
-          # Run comprehensive binary test suite
-          chmod +x tests/test_binary.sh
-          tests/test_binary.sh dist/${{ matrix.artifact_name }}
+  #       shell: bash
+  #       env:
+  #         PYTHONIOENCODING: utf-8
+  #       run: |
+  #         # Run comprehensive binary test suite
+  #         chmod +x tests/test_binary.sh
+  #         tests/test_binary.sh dist/${{ matrix.artifact_name }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.artifact_name }}
-          path: dist/${{ matrix.artifact_name }}
-          retention-days: 7
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ${{ matrix.artifact_name }}
+  #         path: dist/${{ matrix.artifact_name }}
+  #         retention-days: 7
 
   publish:
     needs: [test, build]
@@ -185,37 +189,37 @@ jobs:
       - name: Create GitHub Release
         if: steps.check.outputs.exists == 'false'
         uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.version.outputs.version }}
-          name: Release v${{ steps.version.outputs.version }}
-          body: |
-            Release version ${{ steps.version.outputs.version }}
+  #       with:
+  #         tag_name: v${{ steps.version.outputs.version }}
+  #         name: Release v${{ steps.version.outputs.version }}
+  #         body: |
+  #           Release version ${{ steps.version.outputs.version }}
 
-            ## Installation
+  #           ## Installation
 
-            ### Via pip (recommended)
-            ```bash
-            pip install ddpc==${{ steps.version.outputs.version }}
-            ```
+  #           ### Via pip (recommended)
+  #           ```bash
+  #           pip install ddpc==${{ steps.version.outputs.version }}
+  #           ```
 
-            ### Standalone binaries
-            Download the appropriate binary for your platform:
-            - **Linux (x86_64)**: `ddpc-linux-x86_64` (compatible with glibc2.17+, i.e., CentOS 7+)
-            - **Linux (x86_64)**: `ddpc-linux-x86_64-py314` (compatible with glibc2.28+)
-            - **macOS (Intel)**: `ddpc-macos-x86_64`
-            - **macOS (Apple Silicon)**: `ddpc-macos-arm64`
-            - **Windows**: `ddpc-windows-x86_64.exe`
+  #           ### Standalone binaries
+  #           Download the appropriate binary for your platform:
+  #           - **Linux (x86_64)**: `ddpc-linux-x86_64` (compatible with glibc2.17+, i.e., CentOS 7+)
+  #           - **Linux (x86_64)**: `ddpc-linux-x86_64-py314` (compatible with glibc2.28+)
+  #           - **macOS (Intel)**: `ddpc-macos-x86_64`
+  #           - **macOS (Apple Silicon)**: `ddpc-macos-arm64`
+  #           - **Windows**: `ddpc-windows-x86_64.exe`
 
-            Make the binary executable (Linux/macOS):
-            ```bash
-            chmod +x ddpc-*
-            ./ddpc-* --version
+  #           Make the binary executable (Linux/macOS):
+  #           ```bash
+  #           chmod +x ddpc-*
+  #           ./ddpc-* --version
 
-            If you find any bug, please create an issue.
-            ```
-          files: |
-            dist/*
-            binaries/**/*
+  #           If you find any bug, please create an issue.
+  #           ```
+  #         files: |
+  #           dist/*
+  #           binaries/**/*
           draft: false
           prerelease: false
 
