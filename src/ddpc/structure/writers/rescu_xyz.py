@@ -54,7 +54,7 @@ def _add_with_mag(symbols, positions, fix_info, mags, ret) -> str:
     if mags.shape == (len(symbols), 3):
         if fix_info is not None and fix_info.any():
             for symbol, pos, mag, moveable_xyz in zip(
-                symbols, positions, mags, fix_info, strict=True
+                symbols, positions, mags, fix_info
             ):
                 moveable = f"{moveable_xyz[0]} {moveable_xyz[1]} {moveable_xyz[2]}"
                 _mag = f"{mag[0]:.2f} {mag[1]:.2f} {mag[2]:.2f}"
@@ -66,7 +66,7 @@ def _add_with_mag(symbols, positions, fix_info, mags, ret) -> str:
     elif mags.shape == (len(symbols),):
         if fix_info is not None and fix_info.any():
             for symbol, pos, mag, moveable_xyz in zip(
-                symbols, positions, mags, fix_info, strict=True
+                symbols, positions, mags, fix_info
             ):
                 moveable = f"{moveable_xyz[0]} {moveable_xyz[1]} {moveable_xyz[2]}"
                 ret += f"{symbol} {pos[0]:.6f} {pos[1]:.6f} {pos[2]:.6f} {mag:.2f} {moveable}\n"

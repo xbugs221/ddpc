@@ -47,7 +47,7 @@ def to_csv(
     lengths = [len(arr) for arr in arrays]
     if len(set(lengths)) > 1:
         raise ValueError(
-            f"Inconsistent array lengths: {dict(zip(flat_data.keys(), lengths, strict=False))}"
+            f"Inconsistent array lengths: {dict(zip(flat_data.keys(), lengths))}"
         )
 
     # Build CSV lines
