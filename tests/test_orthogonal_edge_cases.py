@@ -81,7 +81,7 @@ class TestCubicSupercellTransformationEdgeCases:
         """Test that max_atoms constraint is respected."""
         atoms = bulk("Cu", "fcc", a=3.6)
         transformer = CubicSupercellTransformation(min_length=10.0, max_atoms=50, min_atoms=10)
-        with pytest.raises(AttributeError, match="max number of atoms was exceeded"):
+        with pytest.raises(ValueError, match="max number of atoms was exceeded"):
             transformer.apply_transformation(atoms)
 
     def test_max_length_constraint(self):

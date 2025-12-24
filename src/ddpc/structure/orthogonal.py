@@ -42,6 +42,9 @@ def find_orthogonal(atoms: Atoms, **kwargs) -> Atoms:
 
     try:
         orthed_s = CubicSupercellTransformation(**kwargs).apply_transformation(atoms)
+    except AttributeError:
+        # Re-raise AttributeError as it indicates configuration issues, not algorithmic failures
+        raise
     except Exception as e:
         raise ValueError("No orthogonal supercell found. You may try other kwargs.") from e
 
@@ -287,7 +290,7 @@ class CubicSupercellTransformation:
     def check_exceptions(self, length_vecs, n_atoms):
         """Check supercell exceptions."""
         if n_atoms > self.max_atoms:
-            raise AttributeError(
+            raise ValueError(
                 "While trying to solve for the supercell, the max "
                 "number of atoms was exceeded. Try lowering the number"
                 "of nearest neighbor distances."
@@ -296,7 +299,7 @@ class CubicSupercellTransformation:
             self.max_length is not None
             and np.max(np.linalg.norm(length_vecs, axis=1)) >= self.max_length
         ):
-            raise AttributeError(
+            raise ValueError(
                 "While trying to solve for the supercell, the max length was exceeded."
             )
 
