@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  test-3.7:
+  test37:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -31,7 +31,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-  test3.8-3.14:
+  test38:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
