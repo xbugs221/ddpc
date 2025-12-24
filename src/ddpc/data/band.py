@@ -152,7 +152,7 @@ def read_tband(band, h5: bool = True) -> Dict[str, np.ndarray]:
         )
     ski = band["BandInfo"]["SymmetryKPointsIndex"]
     sk_column = [""] * nkpt
-    for i, symbol in zip(ski, sk, strict=True):
+    for i, symbol in zip(ski, sk):
         sk_column[i - 1] = symbol
     data = {
         "label": np.array(sk_column),
@@ -187,7 +187,7 @@ def read_pband_h5(band, mode: int) -> Dict[str, np.ndarray]:
     ski: List[int] = band["BandInfo/SymmetryKPointsIndex"]
 
     sk_column = [""] * nkpt
-    for i, symbol in zip(ski, sk, strict=True):
+    for i, symbol in zip(ski, sk):
         sk_column[i - 1] = symbol
 
     kcoord = np.array(kc).reshape(nkpt, 3)
@@ -255,7 +255,7 @@ def read_pband_json(band: Dict, mode: int) -> Dict[str, np.ndarray]:
     sk: List[str] = band["BandInfo"]["SymmetryKPoints"]
     ski: List[int] = band["BandInfo"]["SymmetryKPointsIndex"]
     sk_column = [""] * nkpt
-    for i, symbol in zip(ski, sk, strict=True):
+    for i, symbol in zip(ski, sk):
         sk_column[i - 1] = symbol
 
     kcoord = np.array(kc).reshape(nkpt, 3)

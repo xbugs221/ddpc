@@ -41,7 +41,7 @@ def _add_lat_lines(freedom: dict, lines: str, atoms: Atoms) -> str:
         fix_str2 = " ".join(formatted_fts[3:6])
         fix_str3 = " ".join(formatted_fts[6:9])
         fix_strs = [fix_str1, fix_str2, fix_str3]
-        for v, fs in zip(atoms.cell.array, fix_strs, strict=True):
+        for v, fs in zip(atoms.cell.array, fix_strs):
             lines += f"{v[0]: 10.4f} {v[1]: 10.4f} {v[2]: 10.4f} {fs}\n"
 
     else:
@@ -77,7 +77,7 @@ def _add_atom_lines(freedom, lines, atoms):
                 raw += "F "
         atom_fix.append(raw.strip())
 
-    for ele, pos, af, magmom in zip(elements, positions, atom_fix, magmoms, strict=True):
+    for ele, pos, af, magmom in zip(elements, positions, atom_fix, magmoms):
         if isinstance(magmom, np.ndarray):
             init_magmom = np.array2string(
                 magmom,
