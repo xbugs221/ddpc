@@ -182,7 +182,14 @@ class TestStructureSubcommands:
             output_file = Path(tmpdir) / "output.cif"
             result = runner.invoke(
                 cli,
-                ["structure", "convert", str(sample_structure_file), str(output_file), "--format", "cif"],
+                [
+                    "structure",
+                    "convert",
+                    str(sample_structure_file),
+                    str(output_file),
+                    "--format",
+                    "cif",
+                ],
             )
             assert result.exit_code == 0
             assert output_file.exists()

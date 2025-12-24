@@ -1,13 +1,14 @@
 """Export data to various formats."""
 
 from pathlib import Path
+from typing import Dict, Union
 
 import numpy as np
 
 
 def to_csv(
-    data: dict[str, np.ndarray],
-    path: str | Path,
+    data: Dict[str, np.ndarray],
+    path: Union[str, Path],
     *,
     delimiter: str = ",",
     header: bool = True,
@@ -63,8 +64,8 @@ def to_csv(
 
 
 def to_npz(
-    data: dict[str, np.ndarray],
-    path: str | Path,
+    data: Dict[str, np.ndarray],
+    path: Union[str, Path],
     *,
     compressed: bool = True,
 ) -> None:

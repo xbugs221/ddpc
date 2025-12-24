@@ -69,9 +69,7 @@ def _safe_invoke_command(cli_group, command_name, ctx, package_name, group_name=
 
         # Show help tip
         full_path = f"{package_name} {group_name}" if group_name else package_name
-        console.print(
-            f"[dim]For more information, run:[/dim] [cyan]{full_path} --help[/cyan]"
-        )
+        console.print(f"[dim]For more information, run:[/dim] [cyan]{full_path} --help[/cyan]")
         sys.exit(2)
 
     command_func = cli_group.commands[command_name]
@@ -96,9 +94,7 @@ def _safe_invoke_command(cli_group, command_name, ctx, package_name, group_name=
         raise
 
 
-@band.command(
-    context_settings={"ignore_unknown_options": True, "allow_extra_args": True}
-)
+@band.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
 @click.pass_context
 def read(ctx):
     """Read band structure data (delegates to ddpc-data)."""
@@ -115,9 +111,7 @@ def read(ctx):
         sys.exit(1)
 
 
-@band.command(
-    context_settings={"ignore_unknown_options": True, "allow_extra_args": True}
-)
+@band.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
 @click.pass_context
 def info(ctx):
     """Show band structure info (delegates to ddpc-data)."""
@@ -134,9 +128,7 @@ def info(ctx):
         sys.exit(1)
 
 
-@dos.command(
-    context_settings={"ignore_unknown_options": True, "allow_extra_args": True}
-)
+@dos.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
 @click.pass_context
 def read(ctx):
     """Read DOS data (delegates to ddpc-data)."""
@@ -153,9 +145,7 @@ def read(ctx):
         sys.exit(1)
 
 
-@dos.command(
-    context_settings={"ignore_unknown_options": True, "allow_extra_args": True}
-)
+@dos.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
 @click.pass_context
 def info(ctx):
     """Show DOS info (delegates to ddpc-data)."""
@@ -172,9 +162,7 @@ def info(ctx):
         sys.exit(1)
 
 
-@structure.command(
-    context_settings={"ignore_unknown_options": True, "allow_extra_args": True}
-)
+@structure.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
 @click.pass_context
 def convert(ctx):
     """Convert structure file formats (delegates to ddpc-structure)."""
@@ -191,9 +179,7 @@ def convert(ctx):
         sys.exit(1)
 
 
-@structure.command(
-    context_settings={"ignore_unknown_options": True, "allow_extra_args": True}
-)
+@structure.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
 @click.pass_context
 def info(ctx):
     """Show structure information (delegates to ddpc-structure)."""
@@ -210,9 +196,7 @@ def info(ctx):
         sys.exit(1)
 
 
-@structure.command(
-    context_settings={"ignore_unknown_options": True, "allow_extra_args": True}
-)
+@structure.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
 @click.pass_context
 def primitive(ctx):
     """Find primitive cell (delegates to ddpc-structure)."""
@@ -229,9 +213,7 @@ def primitive(ctx):
         sys.exit(1)
 
 
-@structure.command(
-    context_settings={"ignore_unknown_options": True, "allow_extra_args": True}
-)
+@structure.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
 @click.pass_context
 def orthogonal(ctx):
     """Find orthogonal supercell (delegates to ddpc-structure)."""
@@ -248,9 +230,7 @@ def orthogonal(ctx):
         sys.exit(1)
 
 
-@structure.command(
-    context_settings={"ignore_unknown_options": True, "allow_extra_args": True}
-)
+@structure.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
 @click.pass_context
 def scale(ctx):
     """Convert to fractional coordinates (delegates to ddpc-structure)."""

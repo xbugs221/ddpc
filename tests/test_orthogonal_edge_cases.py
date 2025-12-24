@@ -1,5 +1,6 @@
 """Test edge cases and error handling for orthogonal supercell."""
 
+import numpy as np
 import pytest
 from ase.build import bulk
 
@@ -9,7 +10,6 @@ from ddpc.structure.orthogonal import (
     _round_and_make_arr_singular,
     find_orthogonal,
 )
-import numpy as np
 
 
 class TestHelperFunctions:
@@ -70,7 +70,7 @@ class TestFindOrthogonal:
     def test_max_length_required_for_orthorhombic(self):
         """Test that max_length is required for orthorhombic."""
         atoms = bulk("Cu", "fcc", a=3.6)
-        with pytest.raises(ValueError):
+        with pytest.raises(AttributeError, match="max_length is required for orthorhombic cells"):
             find_orthogonal(atoms, allow_orthorhombic=True, min_length=10.0)
 
 
@@ -80,9 +80,7 @@ class TestCubicSupercellTransformationEdgeCases:
     def test_max_atoms_constraint(self):
         """Test that max_atoms constraint is respected."""
         atoms = bulk("Cu", "fcc", a=3.6)
-        transformer = CubicSupercellTransformation(
-            min_length=10.0, max_atoms=50, min_atoms=10
-        )
+        transformer = CubicSupercellTransformation(min_length=10.0, max_atoms=50, min_atoms=10)
         with pytest.raises(AttributeError, match="max number of atoms was exceeded"):
             transformer.apply_transformation(atoms)
 
@@ -90,31 +88,27 @@ class TestCubicSupercellTransformationEdgeCases:
         """Test that max_length constraint is respected when possible."""
         atoms = bulk("Cu", "fcc", a=3.6)
         # Use reasonable constraints to get a valid supercell
-        transformer = CubicSupercellTransformation(
-            min_length=10.0, max_length=15.0, max_atoms=500
-        )
+        transformer = CubicSupercellTransformation(min_length=10.0, max_length=15.0, max_atoms=500)
         result = transformer.apply_transformation(atoms)
         # Verify all lattice vectors are within max_length
         lengths = result.cell.lengths()
-        assert all(length <= 15.0 for length in lengths), f"Some lengths exceed max_length: {lengths}"
+        assert all(length <= 15.0 for length in lengths), (
+            f"Some lengths exceed max_length: {lengths}"
+        )
         # Verify at least one lattice vector is >= min_length
         assert any(length >= 10.0 for length in lengths), f"No length >= min_length: {lengths}"
 
     def test_min_atoms_constraint(self):
         """Test that min_atoms constraint is respected."""
         atoms = bulk("Cu", "fcc", a=3.6)
-        transformer = CubicSupercellTransformation(
-            min_length=10.0, min_atoms=50, max_atoms=500
-        )
+        transformer = CubicSupercellTransformation(min_length=10.0, min_atoms=50, max_atoms=500)
         result = transformer.apply_transformation(atoms)
         assert len(result) >= 50
 
     def test_force_diagonal_small_cell(self):
         """Test force_diagonal with small cell."""
         atoms = bulk("Si", "diamond", a=5.43)
-        transformer = CubicSupercellTransformation(
-            min_length=5.0, force_diagonal=True
-        )
+        transformer = CubicSupercellTransformation(min_length=5.0, force_diagonal=True)
         result = transformer.apply_transformation(atoms)
         # Check that result is larger than original
         assert len(result) >= len(atoms)
@@ -122,9 +116,7 @@ class TestCubicSupercellTransformationEdgeCases:
     def test_orthorhombic_without_max_length(self):
         """Test that orthorhombic requires max_length."""
         atoms = bulk("Cu", "fcc", a=3.6)
-        transformer = CubicSupercellTransformation(
-            min_length=10.0, allow_orthorhombic=True
-        )
+        transformer = CubicSupercellTransformation(min_length=10.0, allow_orthorhombic=True)
         with pytest.raises(AttributeError, match="max_length is required"):
             transformer.apply_transformation(atoms)
 
@@ -134,6 +126,6 @@ class TestCubicSupercellTransformationEdgeCases:
         transformer = CubicSupercellTransformation(
             min_length=10.0, max_atoms=500, force_diagonal=True
         )
-        result = transformer.apply_transformation(atoms)
+        transformer.apply_transformation(atoms)
         assert transformer.transformation_matrix is not None
         assert isinstance(transformer.transformation_matrix, np.ndarray)

@@ -2,7 +2,7 @@
 
 import os
 import sys
-from typing import cast
+from typing import Tuple, Union, cast
 
 import numpy as np
 
@@ -35,7 +35,7 @@ def get_h5_str(f: str, key: str) -> list:
     return tempdata_str.split(";")
 
 
-def _split_atomindex_orbital(s: str) -> tuple[int, str]:
+def _split_atomindex_orbital(s: str) -> Tuple[int, str]:
     """Split a string into atom index and orbital designation."""
     first_letter_index = -1
     for i, char in enumerate(s):
@@ -50,7 +50,7 @@ def _split_atomindex_orbital(s: str) -> tuple[int, str]:
     return int(atom_index_str), orbital_str
 
 
-def _get_ao_spin(k: str) -> tuple[str, str]:
+def _get_ao_spin(k: str) -> Tuple[str, str]:
     """Parse atomic orbital and spin information from formatted key strings."""
     ls = k.split("-")
     if len(ls) == 1:  # nospin
@@ -61,7 +61,7 @@ def _get_ao_spin(k: str) -> tuple[str, str]:
     sys.exit(1)
 
 
-def _inplace_update_data(_data: dict, key: str, v: np.ndarray | list) -> None:
+def _inplace_update_data(_data: dict, key: str, v: Union[np.ndarray, list]) -> None:
     """Update data dictionary by adding values to existing keys or creating new ones."""
     if key in _data:
         _data[key] += np.asarray(v)

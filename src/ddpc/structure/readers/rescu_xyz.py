@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Union
 
 import numpy as np
 
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from ase.atoms import Atoms
 
 
-def read(p: str | Path) -> Atoms:
+def read(p: Union[str, Path]) -> Atoms:
     """Read RESCU XYZ format and convert to ASE Atoms.
 
     Supports magnetic moments and position constraints.
@@ -46,12 +46,12 @@ def read(p: str | Path) -> Atoms:
     return Atoms(symbols=elements, positions=pos, magmoms=mags, pbc=True, info=fix_info)
 
 
-def _read_prop(lines: list[str]):
+def _read_prop(lines: List[str]):
     """Parse atomic properties from RESCU XYZ lines."""
     nele = 0
     elements = []
     pos = []
-    mags: list[float | list[float]] = []
+    mags: List[Union[float, List[float]]] = []
     moveable_indices_x = []
     moveable_indices_y = []
     moveable_indices_z = []

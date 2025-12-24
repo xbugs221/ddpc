@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from ase.atoms import Atoms
 
 
-def read_structure(file: str | Path, format: str | None = None) -> Atoms:
+def read_structure(file: Union[str, Path], format: Union[str, None] = None) -> Atoms:
     """Read crystal structure from file.
 
     Args:
@@ -45,9 +45,9 @@ def read_structure(file: str | Path, format: str | None = None) -> Atoms:
 
 
 def write_structure(
-    file: str | Path,
+    file: Union[str, Path],
     atoms: Atoms,
-    format: str | None = None,
+    format: Union[str, None] = None,
     **kwargs,
 ) -> None:
     """Write crystal structure to file.

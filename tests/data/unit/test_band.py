@@ -131,7 +131,8 @@ class TestReadBandH5:
         band_keys = [k for k in data.keys() if k.startswith("band")]
         has_up = any("-up" in k for k in band_keys)
         has_down = any("-down" in k for k in band_keys)
-        assert has_up and has_down, "Collinear bands should have both -up and -down"
+        assert has_up, "Collinear bands should have -up spin"
+        assert has_down, "Collinear bands should have -down spin"
 
     def test_read_band_h5_invalid_group(self, temp_output_dir):
         """Test error handling for H5 file without BandInfo group."""

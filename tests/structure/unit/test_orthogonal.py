@@ -8,7 +8,6 @@ from ddpc.structure import find_orthogonal
 
 def test_find_orthogonal_basic():
     """Test basic orthogonal supercell finding."""
-
     # Create a non-orthogonal structure
     cell = [[3.0, 0.0, 0.0], [1.5, 2.6, 0.0], [0.0, 0.0, 4.0]]
     atoms = Atoms("C2", positions=[[0, 0, 0], [1, 1, 2]], cell=cell, pbc=True)
@@ -30,7 +29,6 @@ def test_find_orthogonal_no_cell():
 
 def test_find_orthogonal_with_kwargs():
     """Test orthogonal supercell with various kwargs."""
-
     cell = [[3.0, 0.0, 0.0], [1.5, 2.6, 0.0], [0.0, 0.0, 4.0]]
     atoms = Atoms("C2", positions=[[0, 0, 0], [1, 1, 2]], cell=cell, pbc=True)
 

@@ -73,18 +73,17 @@ def get_symmetry(
 
 def _get_crystal_system(spacegroup_number: int) -> str:
     """Map space group number to crystal system."""
-    if 1 <= spacegroup_number <= 2:
-        return "triclinic"
-    if 3 <= spacegroup_number <= 15:
-        return "monoclinic"
-    if 16 <= spacegroup_number <= 74:
-        return "orthorhombic"
-    if 75 <= spacegroup_number <= 142:
-        return "tetragonal"
-    if 143 <= spacegroup_number <= 167:
-        return "trigonal"
-    if 168 <= spacegroup_number <= 194:
-        return "hexagonal"
-    if 195 <= spacegroup_number <= 230:
-        return "cubic"
+    crystal_systems = [
+        (1, 2, "triclinic"),
+        (3, 15, "monoclinic"),
+        (16, 74, "orthorhombic"),
+        (75, 142, "tetragonal"),
+        (143, 167, "trigonal"),
+        (168, 194, "hexagonal"),
+        (195, 230, "cubic"),
+    ]
+
+    for min_num, max_num, system in crystal_systems:
+        if min_num <= spacegroup_number <= max_num:
+            return system
     return "unknown"

@@ -1,5 +1,7 @@
 """Projection mode processing for band and DOS data, internal use only."""
 
+from typing import List, Union
+
 import numpy as np
 
 from ddpc.data.utils import (
@@ -10,7 +12,7 @@ from ddpc.data.utils import (
 
 
 # Band processing functions
-def _band_ele(data: dict, nkpt: int, nband: int, elements: list[str], _data: dict) -> None:
+def _band_ele(data: dict, nkpt: int, nband: int, elements: List[str], _data: dict) -> None:
     """Process band data in element-resolved mode (mode 1)."""
     for k, v in data.items():
         if k.startswith(("k", "label", "dist")):
@@ -27,7 +29,7 @@ def _band_ele(data: dict, nkpt: int, nband: int, elements: list[str], _data: dic
                 _inplace_update_data(_data, key, cont[b])
 
 
-def _band_elespdf(data: dict, nkpt: int, nband: int, elements: list[str], _data: dict) -> None:
+def _band_elespdf(data: dict, nkpt: int, nband: int, elements: List[str], _data: dict) -> None:
     """Process band data in element + spdf mode (mode 2)."""
     for k, v in data.items():
         if k.startswith(("k", "label", "dist")):
@@ -44,7 +46,7 @@ def _band_elespdf(data: dict, nkpt: int, nband: int, elements: list[str], _data:
                 _inplace_update_data(_data, key, cont[b])
 
 
-def _band_elepxpy(data: dict, nkpt: int, nband: int, elements: list[str], _data: dict) -> None:
+def _band_elepxpy(data: dict, nkpt: int, nband: int, elements: List[str], _data: dict) -> None:
     """Process band data in element + detailed orbital mode (mode 3)."""
     for k, v in data.items():
         if k.startswith(("k", "label", "dist")):
@@ -95,7 +97,7 @@ def _band_atompxpy(data: dict, nkpt: int, nband: int, _data: dict) -> None:
                 _inplace_update_data(_data, key, cont[b])
 
 
-def _refactor_band(data: dict, nkpt: int, nband: int, elements: list[str], mode: int) -> dict:
+def _refactor_band(data: dict, nkpt: int, nband: int, elements: List[str], mode: int) -> dict:
     """Refactor band data based on projection mode.
 
     Args:
@@ -166,7 +168,7 @@ def _dos_spxpy(data: dict, energies: np.ndarray) -> dict:
     return _data
 
 
-def _dos_element(data: dict, elements: list[str] | None, energies: np.ndarray) -> dict:
+def _dos_element(data: dict, elements: Union[List[str], None], energies: np.ndarray) -> dict:
     """Process DOS data in element-resolved mode (mode 3)."""
     if not elements:
         raise ValueError(f"{elements=}")
@@ -245,10 +247,10 @@ def _dos_atom(data: dict, energies: np.ndarray) -> dict:
 
 
 def _refactor_dos(
-    energies: list | np.ndarray,
+    energies: Union[list, np.ndarray],
     data: dict,
     mode: int,
-    elements: list[str] | None = None,
+    elements: Union[List[str], None] = None,
 ) -> dict:
     """Refactor DOS data based on projection mode.
 

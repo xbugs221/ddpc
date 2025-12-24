@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -66,12 +66,13 @@ def _proj(b: NDArray, a: NDArray) -> NDArray:
 
 
 def _round_and_make_arr_singular(arr: np.ndarray) -> np.ndarray:
-    """This function rounds all elements of a matrix to the nearest integer,
-    unless the rounding scheme causes the matrix to be singular, in which
-    case elements of zero rows or columns in the rounded matrix with the
-    largest absolute valued magnitude in the unrounded matrix will be
-    rounded to the next integer away from zero rather than to the
-    nearest integer.
+    """Round matrix elements to nearest integers, ensuring non-singularity.
+
+    Round all elements of a matrix to the nearest integer, unless the rounding
+    scheme causes the matrix to be singular, in which case elements of zero rows
+    or columns in the rounded matrix with the largest absolute valued magnitude
+    in the unrounded matrix will be rounded to the next integer away from zero
+    rather than to the nearest integer.
 
     The transformation is as follows. First, all entries in 'arr' will be
     rounded to the nearest integer to yield 'arr_rounded'. If 'arr_rounded'
@@ -92,7 +93,9 @@ def _round_and_make_arr_singular(arr: np.ndarray) -> np.ndarray:
     """
 
     def round_away_from_zero(x):
-        """Get 'x' rounded to the next integer away from 0.
+        """Round number to the next integer away from zero.
+
+        Get 'x' rounded to the next integer away from 0.
         If 'x' is zero, then returns zero.
         E.g. -1.2 rounds to -2.0. 1.2 rounds to 2.0.
         """
@@ -141,7 +144,9 @@ def _round_and_make_arr_singular(arr: np.ndarray) -> np.ndarray:
 
 
 class CubicSupercellTransformation:
-    """A transformation that aims to generate a nearly cubic supercell structure
+    """Generate nearly cubic supercell structures from input structures.
+
+    A transformation that aims to generate a nearly cubic supercell structure
     from a structure.
 
     The algorithm solves for a transformation matrix that makes the supercell
@@ -155,19 +160,20 @@ class CubicSupercellTransformation:
     ``min_atoms < n < max_atoms``.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
-        min_atoms: int | None = None,
-        max_atoms: int | None = None,
+        min_atoms: Union[int, None] = None,
+        max_atoms: Union[int, None] = None,
         min_length: float = 15.0,
-        max_length: float | None = None,
+        max_length: Union[float, None] = None,
         force_diagonal: bool = False,
         force_90_degrees: bool = False,
         allow_orthorhombic: bool = False,
         angle_tolerance: float = 1e-3,
         step_size: float = 0.1,
     ):
-        """
+        """Initialize cubic supercell transformation parameters.
+
         Args:
             max_atoms: Maximum number of atoms allowed in the supercell.
             min_atoms: Minimum number of atoms allowed in the supercell.
@@ -198,7 +204,9 @@ class CubicSupercellTransformation:
         self.step_size = step_size
 
     def apply_transformation(self, atoms: Atoms) -> Atoms:
-        """The algorithm solves for a transformation matrix that makes the
+        """Apply cubic supercell transformation to input structure.
+
+        The algorithm solves for a transformation matrix that makes the
         supercell cubic. The matrix must have integer entries, so entries are
         rounded (in such a way that forces the matrix to be non-singular). From
         the supercell resulting from this transformation matrix, vector

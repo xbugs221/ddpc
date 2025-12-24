@@ -278,10 +278,10 @@ class TestDosProcessors:
 
     def test_dos_element_no_elements(self, sample_dos_data, sample_dos_energies):
         """Test element mode raises error when element list is missing."""
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="elements=None"):
             _dos_element(sample_dos_data, None, sample_dos_energies)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="elements=\\[\\]"):
             _dos_element(sample_dos_data, [], sample_dos_energies)
 
     def test_dos_atomspdf(self, sample_dos_data, sample_dos_energies):

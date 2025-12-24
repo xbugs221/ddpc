@@ -3,6 +3,7 @@
 import sys
 from json import load
 from pathlib import Path
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 
@@ -12,10 +13,10 @@ from ddpc.data.utils import get_h5_str
 
 
 def read_band(
-    p: str | Path,
+    p: Union[str, Path],
     mode: int = 5,
     fmt: str = "8.3f",
-) -> tuple[dict[str, np.ndarray], float, bool]:
+) -> Tuple[Dict[str, np.ndarray], float, bool]:
     """Read and process electronic band structure data from HDF5 or JSON files.
 
     Parameters
@@ -29,7 +30,7 @@ def read_band(
 
     Returns
     -------
-    tuple of (dict[str, np.ndarray], float, bool)
+    tuple of (Dict[str, np.ndarray], float, bool)
 
         - Dict mapping column names to numpy arrays with k-points and energies
         - Fermi energy in eV
@@ -52,7 +53,7 @@ def read_band(
     return df, efermi, isproj
 
 
-def read_band_h5(absfile: str, mode: int) -> tuple[dict[str, np.ndarray], float, bool]:
+def read_band_h5(absfile: str, mode: int) -> Tuple[Dict[str, np.ndarray], float, bool]:
     """Read band structure data from HDF5 file format.
 
     Lazy imports h5py to avoid unnecessary dependency loading.
@@ -93,7 +94,7 @@ def read_band_h5(absfile: str, mode: int) -> tuple[dict[str, np.ndarray], float,
     return df, efermi, bool(iproj)
 
 
-def read_band_json(absfile: str, mode: int) -> tuple[dict[str, np.ndarray], float, bool]:
+def read_band_json(absfile: str, mode: int) -> Tuple[Dict[str, np.ndarray], float, bool]:
     """Read band structure data from JSON file format."""
     with open(absfile, encoding="utf-8") as fin:
         band = load(fin)
@@ -110,9 +111,9 @@ def read_band_json(absfile: str, mode: int) -> tuple[dict[str, np.ndarray], floa
     return df, efermi, bool(iproj)
 
 
-def read_tband(band, h5: bool = True) -> dict[str, np.ndarray]:
+def read_tband(band, h5: bool = True) -> Dict[str, np.ndarray]:
     """Read total (non-projected) band structure data from file."""
-    kc: list[float] = band["BandInfo"]["CoordinatesOfKPoints"]
+    kc: List[float] = band["BandInfo"]["CoordinatesOfKPoints"]
     nok: int = band["BandInfo"]["NumberOfKpoints"]
     if isinstance(nok, int):
         nkpt = nok
@@ -136,7 +137,7 @@ def read_tband(band, h5: bool = True) -> dict[str, np.ndarray]:
     if h5:
         spin_type_list = get_h5_str(band, "/BandInfo/SpinType")
         collinear = spin_type_list[0] == "collinear"
-        sk: list[str] = get_h5_str(band, "/BandInfo/SymmetryKPoints")
+        sk: List[str] = get_h5_str(band, "/BandInfo/SymmetryKPoints")
         # h5py bands is a nband*nkpt 2d array with C order, have to flatten and reshape it
         bands = (
             np.asarray(band["BandInfo"]["Spin1"]["BandEnergies"])
@@ -177,13 +178,13 @@ def read_tband(band, h5: bool = True) -> dict[str, np.ndarray]:
     return data
 
 
-def read_pband_h5(band, mode: int) -> dict[str, np.ndarray]:
+def read_pband_h5(band, mode: int) -> Dict[str, np.ndarray]:
     """Read orbital-projected band structure data from HDF5 file."""
     kc = band["/BandInfo/CoordinatesOfKPoints"]
     nkpt: int = band["/BandInfo/NumberOfKpoints"][0]
     nband: int = band["/BandInfo/NumberOfBand"][0]
-    sk: list[str] = get_h5_str(band, "/BandInfo/SymmetryKPoints")
-    ski: list[int] = band["BandInfo/SymmetryKPointsIndex"]
+    sk: List[str] = get_h5_str(band, "/BandInfo/SymmetryKPoints")
+    ski: List[int] = band["BandInfo/SymmetryKPointsIndex"]
 
     sk_column = [""] * nkpt
     for i, symbol in zip(ski, sk, strict=True):
@@ -205,7 +206,7 @@ def read_pband_h5(band, mode: int) -> dict[str, np.ndarray]:
         "kz": kz,
         "dist": np.array(dist),
     }
-    orbitals: list[str] = get_h5_str(band, "/BandInfo/Orbit")
+    orbitals: List[str] = get_h5_str(band, "/BandInfo/Orbit")
     atom_index = band["/BandInfo/Spin1/ProjectBand/AtomIndex"][0]
     orb_index = band["/BandInfo/Spin1/ProjectBand/OrbitIndexs"][0]
 
@@ -239,20 +240,20 @@ def read_pband_h5(band, mode: int) -> dict[str, np.ndarray]:
                     }
                 )
 
-    elements: list[str] = get_h5_str(band, "/AtomInfo/Elements")
+    elements: List[str] = get_h5_str(band, "/AtomInfo/Elements")
     _data = _refactor_band(data, nkpt, nband, elements, mode)
 
     return _data
 
 
-def read_pband_json(band: dict, mode: int) -> dict[str, np.ndarray]:
+def read_pband_json(band: Dict, mode: int) -> Dict[str, np.ndarray]:
     """Read orbital-projected band structure data from JSON file."""
-    kc: list[float] = band["BandInfo"]["CoordinatesOfKPoints"]
+    kc: List[float] = band["BandInfo"]["CoordinatesOfKPoints"]
     nkpt: int = band["BandInfo"]["NumberOfKpoints"]
     nband: int = band["BandInfo"]["NumberOfBand"]
 
-    sk: list[str] = band["BandInfo"]["SymmetryKPoints"]
-    ski: list[int] = band["BandInfo"]["SymmetryKPointsIndex"]
+    sk: List[str] = band["BandInfo"]["SymmetryKPoints"]
+    ski: List[int] = band["BandInfo"]["SymmetryKPointsIndex"]
     sk_column = [""] * nkpt
     for i, symbol in zip(ski, sk, strict=True):
         sk_column[i - 1] = symbol
@@ -273,7 +274,7 @@ def read_pband_json(band: dict, mode: int) -> dict[str, np.ndarray]:
         "kz": kz,
         "dist": np.array(dist),
     }
-    orbitals: list[str] = band["BandInfo"]["Orbit"]
+    orbitals: List[str] = band["BandInfo"]["Orbit"]
     if band["BandInfo"]["SpinType"] == "collinear":
         project1 = band["BandInfo"]["Spin1"]["ProjectBand"]
         project2 = band["BandInfo"]["Spin2"]["ProjectBand"]
@@ -295,7 +296,7 @@ def read_pband_json(band: dict, mode: int) -> dict[str, np.ndarray]:
             contrib = p["Contribution"]
             data.update({f"{atom_index}{orbitals[orb_index]}": contrib})
 
-    elements: list[str] = [atom["Element"] for atom in band["AtomInfo"]["Atoms"]]
+    elements: List[str] = [atom["Element"] for atom in band["AtomInfo"]["Atoms"]]
     _data = _refactor_band(data, nkpt, nband, elements, mode)
 
     return _data

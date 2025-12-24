@@ -57,7 +57,7 @@ def convert(input_file, output_file, format, vasp5, direct):
     "--symbol-type", default=0, help="Symbol type: 0=international, 1=Schoenflies (default: 0)"
 )
 @click.option("--show-symmetry", is_flag=True, help="Display symmetry information")
-def info(input_file, symprec, angle_tolerance, hall_number, symbol_type, show_symmetry):
+def info(input_file, symprec, angle_tolerance, hall_number, symbol_type, show_symmetry):  # noqa: PLR0913
     """Display structure information."""
     from ddpc.structure import get_symmetry, read_structure
 
@@ -159,7 +159,7 @@ def primitive(input_file, output, symprec, angle_tolerance, format):
 @click.option("--angle-tolerance", default=0.001, help="Angle tolerance (default: 0.001)")
 @click.option("--step-size", default=0.1, help="Step size for search (default: 0.1)")
 @click.option("--format", help="Output format")
-def orthogonal(
+def orthogonal(  # noqa: PLR0913
     input_file,
     output,
     min_atoms,

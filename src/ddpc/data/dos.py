@@ -3,6 +3,7 @@
 import sys
 from json import load
 from pathlib import Path
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 
@@ -12,9 +13,9 @@ from ddpc.data.utils import get_h5_str
 
 
 def read_dos(
-    p: str | Path,
+    p: Union[str, Path],
     mode: int = 5,
-) -> tuple[dict[str, np.ndarray], float, bool]:
+) -> Tuple[Dict[str, np.ndarray], float, bool]:
     """Read and process electronic density of states data from HDF5 or JSON files.
 
     Parameters
@@ -27,7 +28,7 @@ def read_dos(
 
     Returns
     -------
-    tuple of (dict[str, np.ndarray], float, bool)
+    tuple of (Dict[str, np.ndarray], float, bool)
 
         - Dict mapping column names to numpy arrays with energy and DOS values
         - Fermi energy in eV
@@ -50,7 +51,7 @@ def read_dos(
     return df, efermi, isproj
 
 
-def read_dos_h5(absfile: str, mode: int) -> tuple[dict[str, np.ndarray], float, bool]:
+def read_dos_h5(absfile: str, mode: int) -> Tuple[Dict[str, np.ndarray], float, bool]:
     """Read density of states data from HDF5 file format.
 
     Lazy imports h5py to avoid unnecessary dependency loading.
@@ -90,7 +91,7 @@ def read_dos_h5(absfile: str, mode: int) -> tuple[dict[str, np.ndarray], float, 
     return df, efermi, bool(iproj)
 
 
-def read_dos_json(absfile: str, mode: int) -> tuple[dict[str, np.ndarray], float, bool]:
+def read_dos_json(absfile: str, mode: int) -> Tuple[Dict[str, np.ndarray], float, bool]:
     """Read density of states data from JSON file format."""
     with open(absfile, encoding="utf-8") as fin:
         dos = load(fin)
@@ -106,7 +107,7 @@ def read_dos_json(absfile: str, mode: int) -> tuple[dict[str, np.ndarray], float
     return df, efermi, bool(iproj)
 
 
-def read_tdos(dos, h5: bool = True) -> dict[str, np.ndarray]:
+def read_tdos(dos, h5: bool = True) -> Dict[str, np.ndarray]:
     """Read total (non-projected) density of states data."""
     energies = np.asarray(dos["DosInfo"]["DosEnergy"])
 
@@ -129,11 +130,11 @@ def read_tdos(dos, h5: bool = True) -> dict[str, np.ndarray]:
     return densities
 
 
-def read_pdos_h5(dos, mode: int) -> dict[str, np.ndarray]:
+def read_pdos_h5(dos, mode: int) -> Dict[str, np.ndarray]:
     """Read orbital-projected density of states data from HDF5 file."""
-    energies: list[float] = dos["/DosInfo/DosEnergy"]
+    energies: List[float] = dos["/DosInfo/DosEnergy"]
     data = {}
-    orbitals: list[str] = get_h5_str(dos, "/DosInfo/Orbit")
+    orbitals: List[str] = get_h5_str(dos, "/DosInfo/Orbit")
 
     atom_index: int = dos["/DosInfo/Spin1/ProjectDos/AtomIndexs"][0]  # 2
     orb_index: int = dos["/DosInfo/Spin1/ProjectDos/OrbitIndexs"][0]  # 9
@@ -172,7 +173,7 @@ def read_pdos_h5(dos, mode: int) -> dict[str, np.ndarray]:
                 )
 
     if mode == 3:
-        elements: list[str] = get_h5_str(dos, "/AtomInfo/Elements")
+        elements: List[str] = get_h5_str(dos, "/AtomInfo/Elements")
     else:
         elements = []
     _data = _refactor_dos(energies, data, mode, elements)
@@ -180,11 +181,11 @@ def read_pdos_h5(dos, mode: int) -> dict[str, np.ndarray]:
     return _data
 
 
-def read_pdos_json(dos: dict, mode: int) -> dict[str, np.ndarray]:
+def read_pdos_json(dos: Dict, mode: int) -> Dict[str, np.ndarray]:
     """Read orbital-projected density of states data from JSON file."""
-    energies: list[float] = dos["DosInfo"]["DosEnergy"]
+    energies: List[float] = dos["DosInfo"]["DosEnergy"]
     data = {}
-    orbitals: list[str] = dos["DosInfo"]["Orbit"]
+    orbitals: List[str] = dos["DosInfo"]["Orbit"]
 
     if dos["DosInfo"]["SpinType"] == "collinear":
         data.update(
@@ -218,7 +219,7 @@ def read_pdos_json(dos: dict, mode: int) -> dict[str, np.ndarray]:
             data.update({f"{atom_index}{orbitals[orb_index]}": contrib})
 
     if mode == 3:
-        elements: list[str] = [atom["Element"] for atom in dos["AtomInfo"]["Atoms"]]
+        elements: List[str] = [atom["Element"] for atom in dos["AtomInfo"]["Atoms"]]
     else:
         elements = []
     _data = _refactor_dos(energies, data, mode, elements)
